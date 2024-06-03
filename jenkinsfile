@@ -1,0 +1,38 @@
+pipeline {
+    agent any 
+  tools {
+        // Use the Maven version configured in Jenkins
+        maven 'Maven 3.9.7'
+        jdk 'Java 11'
+    }
+     
+    stage('Checkout') {
+            steps {
+                // Checkout the code from the repository
+                git 'https://github.com/kunal975/simple-java-maven-app.git'
+            }
+        }
+
+
+    stages {
+        stage('Test') {
+            steps {
+                // Run tests
+                sh 'mvn test'
+            }
+        }
+
+        stage('Code Coverage') {
+            steps {
+                // Run code coverage analysis
+                sh 'mvn jacoco:report'
+            }
+            post {
+                always {
+                    // Archive the code coverage report
+                    jacoco execPattern: '**/target/*.exec', sourcePattern: 'src/main/java', classPattern: 'target/classes'
+                }
+            }
+        }
+    }
+}
